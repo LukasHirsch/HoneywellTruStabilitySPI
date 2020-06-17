@@ -5,7 +5,7 @@
 # Constants (LITERAL1)
 #######################################
 
-TruStabilityPressureSensor	KEYWORD1
+HoneywellPressureSensor	KEYWORD1
 begin	KEYWORD2
 readSensor	KEYWORD2
 rawPressure	KEYWORD2

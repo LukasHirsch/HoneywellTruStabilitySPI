@@ -1,7 +1,7 @@
 {
-  "name": "Honeywell TruStability SPI",
-  "keywords": "sensor, pressure, spi",
-  "description": "Arduino library for communicating with Honeywell TruStability HSC or SSC pressure sensors over SPI",
+  "name": "Honeywell Pressure Sensors",
+  "keywords": "sensor, pressure, spi, i2c",
+  "description": "Arduino library for communicating with Honeywell digital pressure sensors (TrueStability HSC, SSC, Basic ABP, etc.) over SPI or I2C",
   "repository":
   {
     "type": "git",
