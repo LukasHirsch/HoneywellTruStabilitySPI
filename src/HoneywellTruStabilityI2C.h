@@ -10,19 +10,20 @@
  *
  * @section intro_sec Introduction
  *
- * This is the documentation for the Hui Lab's Honeywell TruStability
- * HSC and SSC driver for the Arduino platform.  It is designed based on
- * the <a href="https://sensing.honeywell.com/spi-comms-digital-ouptu-pressure-sensors-tn-008202-3-en-final-30may12.pdf">
+ * This is the documentation for the Honeywell TruStability
+ * HSC and SSC and Honeywell Basic ABP driver for the Arduino platform.
+ * It is designed based on the <a href="https://sensing.honeywell.com/i2c-comms-digital-output-pressure-sensors-tn-008201-3-en-final-30may12.pdf">
  * Honeywell technical note</a> for this product.
  *
  * @section dependencies Dependencies
  *
- * This library depends on the  <a href="https://www.arduino.cc/en/Reference/SPI">
- * Arduino SPI library</a>, included in a standard Arduino installation.
+ * This library depends on the <a href="https://www.arduino.cc/en/Reference/Wire"> 
+ * Arduino Wire library</a> included in a standard Arduino installation.
  *
  * @section author Author
  *
- * Written by Erik Werner for the Hui Lab.
+ * Written by Erik Werner for the Hui Lab (SPI version).
+ * Adapted by Lukas Hirschwald for RWTH Aachen University (I2C version).
  *
  * @section license License
  *
@@ -40,16 +41,17 @@ const float MAX_COUNT = 14745.6; ///< 14745 counts (90% of 2^14 counts or 0x3999
 
 /**************************************************************************/
 /*!
-    @brief  Class for reading temperature and pressure from a Honeywell TruStability HSC or SSC sensor
+    @brief  Class for reading temperature and pressure from a Honeywell TruStability HSC, SSC or ABP sensor
 */
 /**************************************************************************/
 class TruStabilityPressureSensor
 {
-    //const uint8_t _SS_PIN;     ///< slave select pin (active low)
     const float _MIN_PRESSURE; ///< minimum calibrated output pressure (10%), in any units
     const float _MAX_PRESSURE; ///< maximum calibrated output pressure (90%), in any units
 
-    //SPISettings _spi_settings;  ///< object to hold SPI configuration settings
+	const uint8_t _i2c_address;
+	const uint32_t _i2c_frequency;
+
     uint8_t _buf[4];            ///< buffer to hold sensor data
     uint8_t _status = 0;        ///< byte to hold status information.
     // Status codes:
@@ -69,32 +71,28 @@ class TruStabilityPressureSensor
     Subsequent calls to pressure() will return values in the
     units of min_pressure and max_pressure
 
-    @param    pin
-              the slave select pin of the sensor
     @param    min_pressure
               the minimum calibrated output pressure
     @param    max_pressure
               the maximum calibrated output pressure
-    @param    spi_settings
-              SPI configuration settings. Default SPI settings use 800 KHz SPI
+    @param    i2c_address
+              I2C address of sensor. Default ist 0x28
+	@param	  i2c_frequency
+			  I2C clock frequency. Honeywell sensors work from 100kHz to 400kHz. Default is 400kHz
     */
     /**************************************************************************/
-    TruStabilityPressureSensor(const uint8_t pin, const float min_pressure,
-    const float max_pressure, SPISettings spi_settings = SPISettings(800000, MSBFIRST, SPI_MODE0))
-    : _SS_PIN(pin), _MIN_PRESSURE(min_pressure), _MAX_PRESSURE(max_pressure), _spi_settings(spi_settings) {}
+    TruStabilityPressureSensor(const float min_pressure, const float max_pressure, const uint8_t i2c_address=0x28, const uint32_t i2c_frequency=400000)
+    : _MIN_PRESSURE(min_pressure), _MAX_PRESSURE(max_pressure), _i2c_address(i2c_address), _i2c_frequency(i2c_frequency) {}
 
     /**************************************************************************/
     /*!
     @brief  Initializes a pressure sensor object.
             This function must be called in the Arduino setup() function.
-            Wire.begin() must be called seperately in setup() before the sensor
-            can be used
     */
     /**************************************************************************/
     void begin()
     {
-        //pinMode(_SS_PIN, OUTPUT);
-        //digitalWrite(_SS_PIN, HIGH);
+        Wire.begin(_i2c_address);
     }
 
     /**************************************************************************/
@@ -114,11 +112,11 @@ class TruStabilityPressureSensor
     {
         uint8_t count = 4; // transfer 4 bytes (the last two are only used by some sensors)
         memset(_buf, 0x00, count); // probably not necessary, sensor is half-duplex
-        //SPI.beginTransaction(_spi_settings);
-        //digitalWrite(_SS_PIN, LOW);
-        //SPI.transfer(_buf, count);
-        //digitalWrite(_SS_PIN, HIGH);
-        //SPI.endTransaction();
+		Wire.requestFrom(_i2c_address, count);
+		while(Wire.available())
+		{
+			_buf[] = Wire.read();
+		}
 
         _status = _buf[0] >> 6 & 0x3;
 
