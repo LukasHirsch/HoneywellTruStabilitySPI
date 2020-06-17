@@ -1,5 +1,5 @@
-#ifndef __HONEYWELL_TRUSTABILITY_SPI_H__
-#define __HONEYWELL_TRUSTABILITY_SPI_H__
+#ifndef __HONEYWELL_PRESSURESENSOR_SPI_H__
+#define __HONEYWELL_PRESSURESENSOR_SPI_H__
 
 #include <SPI.h>
 
@@ -39,10 +39,10 @@ const float MAX_COUNT = 14745.6; ///< 14745 counts (90% of 2^14 counts or 0x3999
 
 /**************************************************************************/
 /*! 
-    @brief  Class for reading temperature and pressure from a Honeywell TruStability HSC or SSC sensor
+    @brief  Class for reading temperature and pressure from a Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.)
 */
 /**************************************************************************/
-class TruStabilityPressureSensor
+class HoneywellPressureSensorSPI
 {
     const uint8_t _SS_PIN;     ///< slave select pin (active low)
     const float _MIN_PRESSURE; ///< minimum calibrated output pressure (10%), in any units
@@ -78,7 +78,7 @@ class TruStabilityPressureSensor
               SPI configuration settings. Default SPI settings use 800 KHz SPI
     */
     /**************************************************************************/
-    TruStabilityPressureSensor(const uint8_t pin, const float min_pressure, 
+    HoneywellPressureSensorSPI(const uint8_t pin, const float min_pressure, 
     const float max_pressure, SPISettings spi_settings = SPISettings(800000, MSBFIRST, SPI_MODE0))
     : _SS_PIN(pin), _MIN_PRESSURE(min_pressure), _MAX_PRESSURE(max_pressure), _spi_settings(spi_settings) {}
 
@@ -223,4 +223,4 @@ class TruStabilityPressureSensor
     }
 };
 
-#endif // End __HONEYWELL_TRUSTABILITY_SPI_H__ include guard
+#endif // End __HONEYWELL_PRESSURESENSOR_SPI_H__ include guard

@@ -1,19 +1,18 @@
-#ifndef __HONEYWELL_TRUSTABILITY_I2C_H__
-#define __HONEYWELL_TRUSTABILITY_I2C_H__
+#ifndef __HONEYWELL_PRESSURESENSOR_I2C_H__
+#define __HONEYWELL_PRESSURESENSOR_I2C_H__
 
 #include <Wire.h>
 
 /*!
- * @file HoneywellTruStabilityI2C.h
+ * @file HoneywellPressureSensorI2C.h
  *
- * @mainpage Honeywell TruStability HSC and SSC digital pressure sensor SPI driver
+ * @mainpage Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.) I2C driver
  *
  * @section intro_sec Introduction
  *
- * This is the documentation for the Honeywell TruStability
- * HSC and SSC and Honeywell Basic ABP driver for the Arduino platform.
- * It is designed based on the <a href="https://sensing.honeywell.com/i2c-comms-digital-output-pressure-sensors-tn-008201-3-en-final-30may12.pdf">
- * Honeywell technical note</a> for this product.
+ * This is the documentation for Honeywell digital pressure sensors (HSC, SSC, ABP, etc.) based on
+ * the <a href="https://sensing.honeywell.com/i2c-comms-digital-output-pressure-sensors-tn-008201-3-en-final-30may12.pdf">
+ * Honeywell technical note</a> for these products.
  *
  * @section dependencies Dependencies
  *
@@ -41,10 +40,10 @@ const float MAX_COUNT = 14745.6; ///< 14745 counts (90% of 2^14 counts or 0x3999
 
 /**************************************************************************/
 /*!
-    @brief  Class for reading temperature and pressure from a Honeywell TruStability HSC, SSC or ABP sensor
+    @brief  Class for reading temperature and pressure from a Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.)
 */
 /**************************************************************************/
-class TruStabilityPressureSensor
+class HoneywellPressureSensorI2C
 {
     const float _MIN_PRESSURE; ///< minimum calibrated output pressure (10%), in any units
     const float _MAX_PRESSURE; ///< maximum calibrated output pressure (90%), in any units
@@ -81,7 +80,7 @@ class TruStabilityPressureSensor
 			  I2C clock frequency. Honeywell sensors work from 100kHz to 400kHz. Default is 400kHz
     */
     /**************************************************************************/
-    TruStabilityPressureSensor(const float min_pressure, const float max_pressure, const uint8_t i2c_address=0x28, const uint32_t i2c_frequency=400000)
+    HoneyPressureSensorI2C(const float min_pressure, const float max_pressure, const uint8_t i2c_address=0x28, const uint32_t i2c_frequency=400000)
     : _MIN_PRESSURE(min_pressure), _MAX_PRESSURE(max_pressure), _i2c_address(i2c_address), _i2c_frequency(i2c_frequency) {}
 
     /**************************************************************************/
@@ -93,6 +92,7 @@ class TruStabilityPressureSensor
     void begin()
     {
         Wire.begin(_i2c_address);
+		Wire.setClock(_i2c_frequency);
     }
 
     /**************************************************************************/
@@ -112,10 +112,14 @@ class TruStabilityPressureSensor
     {
         uint8_t count = 4; // transfer 4 bytes (the last two are only used by some sensors)
         memset(_buf, 0x00, count); // probably not necessary, sensor is half-duplex
+		
 		Wire.requestFrom(_i2c_address, count);
-		while(Wire.available())
+		if(Wire.available())
 		{
-			_buf[] = Wire.read();
+			_buf[0] = Wire.read();
+			_buf[1] = Wire.read();
+			_buf[2] = Wire.read();
+			_buf[3] = Wire.read();
 		}
 
         _status = _buf[0] >> 6 & 0x3;
@@ -222,4 +226,4 @@ class TruStabilityPressureSensor
     }
 };
 
-#endif // End __HONEYWELL_TRUSTABILITY_I2C_H__ include guard
+#endif // End __HONEYWELL_PRESSURESENSOR_I2C_H__ include guard

@@ -12,7 +12,7 @@
 #include <HoneywellPressureSensorI2C.h>
 
 #define I2C_ADDRESS 0x28    // this is the default address of honeywell i2c pressure sensors
-TruStabilityPressureSensor sensor( -40.0, 40.0 );
+HoneywellPressureSensorI2C sensor( -40.0, 40.0 );
 
 void setup() {
   Serial.begin(115200);   // start Serial communication

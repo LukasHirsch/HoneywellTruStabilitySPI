@@ -12,7 +12,7 @@
 #include <HoneywellPressureSensorSPI.h>
 
 #define SLAVE_SELECT_PIN SS
-TruStabilityPressureSensor sensor( SLAVE_SELECT_PIN, -15.0, 15.0 );
+HoneywellPressureSensorSPI sensor( SLAVE_SELECT_PIN, -15.0, 15.0 );
 
 void setup() {
   Serial.begin(115200); // start Serial communication
@@ -29,6 +29,6 @@ void loop() {
     Serial.println( sensor.pressure() );
   }
   
-  delay( 100 ); // Slow down sampling to 10 Hz. This is just a test.
+  delay( 500 ); // Slow down sampling to 2 Hz. This is just a test.
 
 }
