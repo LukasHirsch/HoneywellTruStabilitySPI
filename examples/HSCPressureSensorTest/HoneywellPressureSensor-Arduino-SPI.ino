@@ -2,14 +2,14 @@
  * PressureSensorTest
  *
  * Fetch and print values from a Honeywell 
- * TruStability HSC Pressure Sensor over SPI
+ * Pressure Sensor over SPI.
  * 
  * The sensor values used in this demo are 
  * for a -15 to 15 psi/mbar/bar gauge pressure sensor. 
  * The unit depends on your sensor.
  */
 
-#include <HoneywellTruStabilitySPI.h>
+#include <HoneywellPressureSensorSPI.h>
 
 #define SLAVE_SELECT_PIN SS
 TruStabilityPressureSensor sensor( SLAVE_SELECT_PIN, -15.0, 15.0 );
