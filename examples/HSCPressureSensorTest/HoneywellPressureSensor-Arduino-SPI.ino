@@ -5,8 +5,8 @@
  * TruStability HSC Pressure Sensor over SPI
  * 
  * The sensor values used in this demo are 
- * for a -15 to 15 psi gauge pressure sensor. 
- * 
+ * for a -15 to 15 psi/mbar/bar gauge pressure sensor. 
+ * The unit depends on your sensor.
  */
 
 #include <HoneywellTruStabilitySPI.h>
@@ -25,7 +25,7 @@ void loop() {
   if( sensor.readSensor() == 0 ) {
     Serial.print( "temp [C]: " );
     Serial.print( sensor.temperature() );
-    Serial.print( "\t pressure [psi]: " );
+    Serial.print( "\t pressure [psi/mbar/bar]: " );
     Serial.println( sensor.pressure() );
   }
   
