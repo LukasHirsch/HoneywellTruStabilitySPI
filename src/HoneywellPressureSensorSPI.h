@@ -4,16 +4,15 @@
 #include <SPI.h>
 
 /*!
- * @file HoneywellTruStabilitySPI.h
+ * @file HoneywellPressureSensorSPI.h
  *
- * @mainpage Honeywell TruStability HSC and SSC digital pressure sensor SPI driver
+ * @mainpage Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.) SPI driver
  *
  * @section intro_sec Introduction
  *
- * This is the documentation for the Hui Lab's Honeywell TruStability 
- * HSC and SSC driver for the Arduino platform.  It is designed based on
+ * This is the documentation for Honeywell digital pressure sensors (HSC, SSC, ABP, etc.) based on
  * the <a href="https://sensing.honeywell.com/spi-comms-digital-ouptu-pressure-sensors-tn-008202-3-en-final-30may12.pdf">
- * Honeywell technical note</a> for this product.
+ * Honeywell technical note</a> for these products.
  *
  * @section dependencies Dependencies
  *
