@@ -5,7 +5,7 @@
  * Pressure Sensor over I2C using an Arduino
  * 
  * The sensor values used in this demo are 
- * for a -40 to 40 psi/mbar/bar gauge pressure sensor.
+ * for a -40 to 40 psi/kPa/mbar/bar differential pressure sensor.
  * The unit depends on your sensor.
  */
 

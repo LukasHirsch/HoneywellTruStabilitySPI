@@ -5,7 +5,7 @@
  * Pressure Sensor over SPI.
  * 
  * The sensor values used in this demo are 
- * for a -15 to 15 psi/mbar/bar gauge pressure sensor. 
+ * for a -15 to 15 psi/kPa/mbar/bar differential pressure sensor. 
  * The unit depends on your sensor.
  */
 

@@ -1,23 +1,34 @@
-#ifndef __HONEYWELL_PRESSURESENSOR_I2C_H__
-#define __HONEYWELL_PRESSURESENSOR_I2C_H__
+#ifndef __HONEYWELL_PRESSURESENSOR_I2C_TEENSY_H__
+#define __HONEYWELL_PRESSURESENSOR_I2C__TEENSY_H__
 
-#include <Wire.h>
+#include <i2c_t3.h>
 
 /*!
- * @file HoneywellPressureSensorI2C.h
+ * @file HoneywellPressureSensorI2CTeensy.h
  *
- * @mainpage Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.) I2C driver
+ * @mainpage Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.) I2C driver for Teensy 3.x & LC boards
  *
  * @section intro_sec Introduction
  *
  * This is the documentation for Honeywell digital pressure sensors (HSC, SSC, ABP, etc.) based on
  * the <a href="https://sensing.honeywell.com/i2c-comms-digital-output-pressure-sensors-tn-008201-3-en-final-30may12.pdf">
  * Honeywell technical note</a> for these products.
+ * It is capable of reading multiple pressure sensors with the same I2C address using the different I2C interfaces of
+ * the Teensy 3.x/LC.
+ * Teensy   Max #Buses
+ * ------   ----------
+ *  LC          2
+ *  3.0         1
+ *  3.1         2
+ *  3.2         2
+ *  3.5         3
+ *  3.6         4
  *
  * @section dependencies Dependencies
  *
- * This library depends on the <a href="https://www.arduino.cc/en/Reference/Wire"> 
- * Arduino Wire library</a> included in a standard Arduino installation.
+ * This library depends on the <a href="https://github.com/nox771/i2c_t3"> 
+ * i2c_t3 library</a>, an enhanced library included in the Teensyduino installation
+ * for Teensy 3.x/LC boards.
  *
  * @section author Author
  *
@@ -43,12 +54,15 @@ const float MAX_COUNT = 14745.6; ///< 14745 counts (90% of 2^14 counts or 0x3999
     @brief  Class for reading temperature and pressure from a Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.)
 */
 /**************************************************************************/
-class HoneywellPressureSensorI2C
+class HoneywellPressureSensorI2CTeensy
 {
     const float _MIN_PRESSURE; ///< minimum calibrated output pressure (10%), in any units
     const float _MAX_PRESSURE; ///< maximum calibrated output pressure (90%), in any units
 
-	const uint8_t _i2c_address;
+	const uint8_t  _i2c_sda_pin;
+	const uint8_t  _i2c_scl_pin;
+	const uint8_t  _i2c_wire_port;
+	const uint8_t  _i2c_address;
 	const uint32_t _i2c_frequency;
 
     uint8_t _buf[4];            ///< buffer to hold sensor data
@@ -74,14 +88,20 @@ class HoneywellPressureSensorI2C
               the minimum calibrated output pressure
     @param    max_pressure
               the maximum calibrated output pressure
+	@param	  i2c_sda_pin
+			  pin number of SDA pin. Default is pin 18.
+	@param	  i2c_scl_pin
+			  pin number of SCL pin. Default is pin 19.
+	@param	  i2c_wire_port
+			  number of I2C port. Default is port 1 [1, 2, 3 or 4].
     @param    i2c_address
               I2C address of sensor. Default ist 0x28
 	@param	  i2c_frequency
 			  I2C clock frequency. Honeywell sensors work from 100kHz to 400kHz. Default is 400kHz
     */
     /**************************************************************************/
-    HoneywellPressureSensorI2C(const float min_pressure, const float max_pressure, const uint8_t i2c_address=0x28, const uint32_t i2c_frequency=400000)
-    : _MIN_PRESSURE(min_pressure), _MAX_PRESSURE(max_pressure), _i2c_address(i2c_address), _i2c_frequency(i2c_frequency) {}
+    HoneywellPressureSensorI2CTeensy(const float min_pressure, const float max_pressure, const uint8_t i2c_sda_pin=18, const uint8_t i2c_scl_pin=19, const uint8_t i2c_wire_port=1, const uint8_t i2c_address=0x28, const uint32_t i2c_frequency=400000)
+    : _MIN_PRESSURE(min_pressure), _MAX_PRESSURE(max_pressure), _i2c_sda_pin(i2c_sda_pin), _i2c_scl_pin(i2c_scl_pin), _i2c_wire_port(i2c_wire_port), _i2c_address(i2c_address), _i2c_frequency(i2c_frequency) {}
 
     /**************************************************************************/
     /*!
@@ -91,8 +111,18 @@ class HoneywellPressureSensorI2C
     /**************************************************************************/
     void begin()
     {
-        Wire.begin(_i2c_address);
-		Wire.setClock(_i2c_frequency);
+		i2c_t3 I2C_t3_Wire = i2c_t3(_i2c_wire_port);
+		I2C_t3_Wire.begin( I2C_SLAVE, _i2c_address, _i2c_scl_pin, _i2c_sda_pin, I2C_PULLUP_EXT, _i2c_frequency, I2C_OP_MODE_ISR );
+		// switch(_i2c_wire_port) {
+			// case 0:
+				// Wire.begin( I2C_SLAVE, _i2c_address, _i2c_scl_pin, _i2c_sda_pin, I2C_PULLUP_EXT, _i2c_frequency, I2C_OP_MODE_ISR );
+			// case 1:
+				// Wire1.begin( I2C_SLAVE, _i2c_address, _i2c_scl_pin, _i2c_sda_pin, I2C_PULLUP_EXT, _i2c_frequency, I2C_OP_MODE_ISR );
+			// case 2:
+				// Wire2.begin( I2C_SLAVE, _i2c_address, _i2c_scl_pin, _i2c_sda_pin, I2C_PULLUP_EXT, _i2c_frequency, I2C_OP_MODE_ISR );
+			// case 3:
+				// Wire3.begin( I2C_SLAVE, _i2c_address, _i2c_scl_pin, _i2c_sda_pin, I2C_PULLUP_EXT, _i2c_frequency, I2C_OP_MODE_ISR );
+		// }
     }
 
     /**************************************************************************/
@@ -113,13 +143,26 @@ class HoneywellPressureSensorI2C
         uint8_t count = 4; // transfer 4 bytes (the last two are only used by some sensors)
         memset(_buf, 0x00, count); // probably not necessary, sensor is half-duplex
 		
-		Wire.requestFrom(_i2c_address, count);
-		if(Wire.available())
+		I2C_t3_Wire.requestFrom(_i2c_address, count);
+		
+		// // switch(_i2c_wire_port) {
+			// // case 0:
+				// // Wire.requestFrom(_i2c_address, count);
+			// // case 1:
+				// // Wire1.requestFrom(_i2c_address, count);
+			// // case 2:
+				// // Wire2.requestFrom(_i2c_address, count);
+			// // case 3:
+				// // Wire3.requestFrom(_i2c_address, count);
+		// // }
+		
+		
+		if(I2C_t3_Wire.available())
 		{
-			_buf[0] = Wire.read();
-			_buf[1] = Wire.read();
-			_buf[2] = Wire.read();
-			_buf[3] = Wire.read();
+			_buf[0] = I2C_t3_Wire.read();
+			_buf[1] = I2C_t3_Wire.read();
+			_buf[2] = I2C_t3_Wire.read();
+			_buf[3] = I2C_t3_Wire.read();
 		}
 
         _status = _buf[0] >> 6 & 0x3;
@@ -226,4 +269,4 @@ class HoneywellPressureSensorI2C
     }
 };
 
-#endif // End __HONEYWELL_PRESSURESENSOR_I2C_H__ include guard
+#endif // End __HONEYWELL_PRESSURESENSOR_I2C_TEENSY_H__ include guard
