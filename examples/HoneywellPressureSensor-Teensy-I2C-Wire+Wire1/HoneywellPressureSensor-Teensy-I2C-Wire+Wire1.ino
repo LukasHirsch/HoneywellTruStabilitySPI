@@ -28,7 +28,7 @@
  * 
  * The library uses the standard I2C pins of Arduino or Teensy.
  */
-HoneywellPressureSensorI2C sensor1( -40.0,  40.0, I2C_ADDRESS_1, I2C_FREQ );  // differential pressure sensor with +-40 psi/kPa/mbar/bar
+HoneywellPressureSensorI2C      sensor1( -40.0,  40.0, I2C_ADDRESS_1, I2C_FREQ );  // differential pressure sensor with +-40 psi/kPa/mbar/bar
 HoneywellPressureSensorI2CWire1 sensor2(   0.0, 160.0, I2C_ADDRESS_2, I2C_FREQ );  // gage pressure sensor with 0 to 160 psi/kPa/mbar/bar
 
 void setup() {
