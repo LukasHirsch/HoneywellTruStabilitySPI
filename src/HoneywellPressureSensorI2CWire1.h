@@ -1,10 +1,10 @@
-#ifndef __HONEYWELL_PRESSURESENSOR_I2C_H__
-#define __HONEYWELL_PRESSURESENSOR_I2C_H__
+#ifndef __HONEYWELL_PRESSURESENSOR_I2C_WIRE1_H__
+#define __HONEYWELL_PRESSURESENSOR_I2C_WIRE1_H__
 
 #include <Wire.h>
 
 /*!
- * @file HoneywellPressureSensorI2C.h
+ * @file HoneywellPressureSensorI2CTeensyWire1.h
  *
  * @mainpage Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.) I2C driver
  *
@@ -29,12 +29,13 @@
  * MIT license
  *
  */
- 
+
 /********** Sensor Configuration *****************/
 /* Values taken from honeywell datasheet        */
+
 // Default values are for 10 - 90 % calibrarion */
-const float MIN_COUNT = 1638.4;  ///< 1638 counts (10% of 2^14 counts or 0x0666)
-const float MAX_COUNT = 14745.6; ///< 14745 counts (90% of 2^14 counts or 0x3999)
+const float MIN_COUNT_WIRE1 = 1638.4;  ///< 1638 counts (10% of 2^14 counts or 0x0666)
+const float MAX_COUNT_WIRE1 = 14745.6; ///< 14745 counts (90% of 2^14 counts or 0x3999)
 /********** Sensor Configuration *****************/
 
 /**************************************************************************/
@@ -42,7 +43,7 @@ const float MAX_COUNT = 14745.6; ///< 14745 counts (90% of 2^14 counts or 0x3999
     @brief  Class for reading temperature and pressure from a Honeywell digital pressure sensor (TrueStability HSC, SSC, Basic ABP, etc.)
 */
 /**************************************************************************/
-class HoneywellPressureSensorI2C
+class HoneywellPressureSensorI2CWire1
 {
     const float _MIN_PRESSURE; ///< minimum calibrated output pressure (10%), in any units
     const float _MAX_PRESSURE; ///< maximum calibrated output pressure (90%), in any units
@@ -79,7 +80,7 @@ class HoneywellPressureSensorI2C
 			  I2C clock frequency. Honeywell sensors work from 100kHz to 400kHz. Default is 400kHz
     */
     /**************************************************************************/
-    HoneywellPressureSensorI2C(const float min_pressure, const float max_pressure, const uint8_t i2c_address=0x28, const uint32_t i2c_frequency=400000)
+    HoneywellPressureSensorI2CWire1(const float min_pressure, const float max_pressure, const uint8_t i2c_address=0x28, const uint32_t i2c_frequency=400000)
     : _MIN_PRESSURE(min_pressure), _MAX_PRESSURE(max_pressure), _i2c_address(i2c_address), _i2c_frequency(i2c_frequency) {}
 
     /**************************************************************************/
@@ -90,8 +91,8 @@ class HoneywellPressureSensorI2C
     /**************************************************************************/
     void begin()
     {
-        Wire.begin(_i2c_address);
-		Wire.setClock(_i2c_frequency);
+        Wire1.begin(_i2c_address);
+		Wire1.setClock(_i2c_frequency);
     }
 
     /**************************************************************************/
@@ -112,13 +113,13 @@ class HoneywellPressureSensorI2C
         uint8_t count = 4; // transfer 4 bytes (the last two are only used by some sensors)
         memset(_buf, 0x00, count); // probably not necessary, sensor is half-duplex
 		
-		Wire.requestFrom(_i2c_address, count);
-		if(Wire.available())
+		Wire1.requestFrom(_i2c_address, count);
+		if(Wire1.available())
 		{
-			_buf[0] = Wire.read();
-			_buf[1] = Wire.read();
-			_buf[2] = Wire.read();
-			_buf[3] = Wire.read();
+			_buf[0] = Wire1.read();
+			_buf[1] = Wire1.read();
+			_buf[2] = Wire1.read();
+			_buf[3] = Wire1.read();
 		}
 
         _status = _buf[0] >> 6 & 0x3;
@@ -194,7 +195,7 @@ class HoneywellPressureSensorI2C
     /**************************************************************************/
     /*!
     @brief  Converts a digital pressure measurement in counts to pressure.
-            The output pressure will be in the units of min_pressure and max_pressure.
+            The output temperature will be in the units of min_pressure and max_pressure.
             This is a helper function to pressure()
     @param    counts
               The raw pressure value
@@ -202,12 +203,12 @@ class HoneywellPressureSensorI2C
               The minimum calibrated output pressure for the sensor, in units of choice
     @param    max_pressure
               The maximum calibrated output pressure for the sensor, in units of choice
-    @return	  Pressure value in units of choice
+    @return Pressure value in units of choice
     */
     /**************************************************************************/
     static float countsToPressure(const int counts, const float min_pressure, const float max_pressure)
     {
-        return ((((float)counts - MIN_COUNT) * (max_pressure - min_pressure)) / (MAX_COUNT - MIN_COUNT)) + min_pressure;
+        return ((((float)counts - MIN_COUNT_WIRE1) * (max_pressure - min_pressure)) / (MAX_COUNT_WIRE1 - MIN_COUNT_WIRE1)) + min_pressure;
     }
 
     /**************************************************************************/
@@ -225,4 +226,4 @@ class HoneywellPressureSensorI2C
     }
 };
 
-#endif // End __HONEYWELL_PRESSURESENSOR_I2C_H__ include guard
+#endif // End __HONEYWELL_PRESSURESENSOR_I2C_WIRE1_H__ include guard
